@@ -1,0 +1,17 @@
+name: foundry-pptx-agent
+description: Foundry-hostable presentation agent that plans and generates PowerPoint decks from approved customer templates.
+template:
+  kind: hosted
+  protocols:
+    - name: responses
+      version: 2024-10-21
+  ports:
+    - 8088
+  environment_variables:
+    - name: TEMPLATES_DIR
+      value: templates
+    - name: OUTPUT_DIR
+      value: generated
+    - name: DEFAULT_TEMPLATE_ID
+      value: sample-board-template
+

@@ -1,0 +1,142 @@
+{
+  "deck": {
+    "title": "AI Strategy Briefing",
+    "audience": "Senior leadership",
+    "tone": "Executive, concise, evidence-backed",
+    "template_id": "sample-board-template",
+    "slide_count": 6
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "intent": "title",
+      "title": "AI Strategy Briefing",
+      "message": "A board-ready view of where AI can create value, where risk needs control, and what to do next.",
+      "layout_hint": "title",
+      "content_blocks": [],
+      "visual_direction": "Use a strong title slide with executive contrast.",
+      "sources": []
+    },
+    {
+      "slide_number": 2,
+      "intent": "executive_summary",
+      "title": "Executive summary",
+      "message": "AI can improve knowledge work, customer operations, and decision velocity when paired with governance and focused use cases.",
+      "layout_hint": "content",
+      "content_blocks": [
+        {
+          "type": "takeaway",
+          "label": "Value",
+          "text": "Prioritize high-volume workflows where cycle time and quality are measurable."
+        },
+        {
+          "type": "takeaway",
+          "label": "Control",
+          "text": "Use managed identity, approved data sources, and traceable generation paths."
+        },
+        {
+          "type": "takeaway",
+          "label": "Action",
+          "text": "Start with one template-governed assistant and expand after quality gates are met."
+        }
+      ],
+      "visual_direction": "Three-card summary with concise labels.",
+      "sources": []
+    },
+    {
+      "slide_number": 3,
+      "intent": "comparison",
+      "title": "Why a Foundry-native approach",
+      "message": "The experience can feel like consumer AI presentation tools while meeting enterprise requirements.",
+      "layout_hint": "comparison",
+      "content_blocks": [
+        {
+          "type": "comparison",
+          "label": "Generic deck generator",
+          "text": "Fast artifact creation, but limited control over templates, storage, identity, and auditability."
+        },
+        {
+          "type": "comparison",
+          "label": "Foundry-native generator",
+          "text": "Customer-owned templates, governed tools, grounded sources, RBAC, tracing, and repeatable quality checks."
+        }
+      ],
+      "visual_direction": "Side-by-side comparison.",
+      "sources": []
+    },
+    {
+      "slide_number": 4,
+      "intent": "timeline",
+      "title": "Path to a pilot",
+      "message": "A narrow pilot can prove template fidelity, artifact quality, and revision workflow before production hardening.",
+      "layout_hint": "timeline",
+      "content_blocks": [
+        {
+          "type": "step",
+          "label": "1. Onboard",
+          "text": "Select one approved template and define supported layouts."
+        },
+        {
+          "type": "step",
+          "label": "2. Generate",
+          "text": "Create structured slide plans and render the deck deterministically."
+        },
+        {
+          "type": "step",
+          "label": "3. Validate",
+          "text": "Check placeholders, package integrity, slide count, and brand rules."
+        },
+        {
+          "type": "step",
+          "label": "4. Iterate",
+          "text": "Support targeted conversational revisions."
+        }
+      ],
+      "visual_direction": "Horizontal process flow.",
+      "sources": []
+    },
+    {
+      "slide_number": 5,
+      "intent": "risks",
+      "title": "Key risks and mitigations",
+      "message": "The pilot should constrain template support and quality gates so the first customer experience is predictable.",
+      "layout_hint": "content",
+      "content_blocks": [
+        {
+          "type": "risk",
+          "label": "Template variability",
+          "text": "Start with a layout catalog and explicit template contract."
+        },
+        {
+          "type": "risk",
+          "label": "Visual overflow",
+          "text": "Keep generated copy concise and validate text length before delivery."
+        },
+        {
+          "type": "risk",
+          "label": "Ungrounded claims",
+          "text": "Require source mappings for research-heavy slides."
+        }
+      ],
+      "visual_direction": "Risk cards with mitigation text.",
+      "sources": []
+    },
+    {
+      "slide_number": 6,
+      "intent": "conclusion",
+      "title": "Recommended next step",
+      "message": "Build a Foundry-hosted prototype around one customer template and one high-value executive briefing workflow.",
+      "layout_hint": "title",
+      "content_blocks": [
+        {
+          "type": "callout",
+          "label": "Decision",
+          "text": "Approve a template-first pilot that demonstrates polished generation inside the Microsoft boundary."
+        }
+      ],
+      "visual_direction": "Strong closing slide with one callout.",
+      "sources": []
+    }
+  ]
+}
+

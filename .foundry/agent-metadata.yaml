@@ -1,0 +1,15 @@
+defaultEnvironment: local
+environments:
+  local:
+    agentName: foundry-pptx-agent
+    projectEndpoint: ""
+    azureContainerRegistry: ""
+    evaluationSuites:
+      - name: sample-board-briefing
+        dataset: examples\sample_deck_plan.json
+        evaluators:
+          - content_quality
+          - template_fidelity
+          - placeholder_leakage
+          - deck_validation
+
