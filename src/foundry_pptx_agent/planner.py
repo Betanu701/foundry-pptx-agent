@@ -4,6 +4,9 @@ from .schemas import ContentBlock, DeckMetadata, DeckPlan, SlidePlan
 
 
 def create_demo_plan(prompt: str, template_id: str, slide_count: int = 6) -> DeckPlan:
+    if _is_implementation_overview(prompt):
+        return _implementation_overview_plan(template_id, slide_count)
+
     topic = _topic_from_prompt(prompt)
     slides = [
         SlidePlan(
@@ -87,6 +90,94 @@ def create_demo_plan(prompt: str, template_id: str, slide_count: int = 6) -> Dec
     )
 
 
+def _implementation_overview_plan(template_id: str, slide_count: int) -> DeckPlan:
+    slides = [
+        SlidePlan(
+            slide_number=1,
+            intent="title",
+            title="Foundry PPTX Agent Overview",
+            message="A ready-to-run prototype for generating polished PowerPoint decks from approved customer templates.",
+            layout_hint="title",
+        ),
+        SlidePlan(
+            slide_number=2,
+            intent="executive_summary",
+            title="What we implemented",
+            message="The repo packages the customer blueprint into a runnable local service with the right seams for Microsoft Foundry.",
+            layout_hint="content",
+            content_blocks=[
+                ContentBlock(type="takeaway", label="Agent surface", text="FastAPI service exposes a Foundry-style /responses endpoint on port 8088."),
+                ContentBlock(type="takeaway", label="PPTX generator", text="Deterministic code creates decks from approved templates instead of free-form XML."),
+                ContentBlock(type="takeaway", label="Demo assets", text="A bundled sample template and deck plan make the repo runnable without customer secrets."),
+            ],
+        ),
+        SlidePlan(
+            slide_number=3,
+            intent="comparison",
+            title="Architecture split",
+            message="The design separates LLM-style planning from deterministic artifact generation.",
+            layout_hint="comparison",
+            content_blocks=[
+                ContentBlock(type="comparison", label="Presentation agent", text="Handles prompt intake, slide planning, revision flow, and response metadata."),
+                ContentBlock(type="comparison", label="Generation service", text="Analyzes templates, renders slides, validates artifacts, and returns a PPTX path."),
+            ],
+        ),
+        SlidePlan(
+            slide_number=4,
+            intent="timeline",
+            title="How the demo runs",
+            message="A customer can clone the repo and generate a deck locally in a few commands.",
+            layout_hint="timeline",
+            content_blocks=[
+                ContentBlock(type="step", label="Install", text="Create a virtual environment and install the package with dev dependencies."),
+                ContentBlock(type="step", label="Template", text="Generate or replace the bundled sample PowerPoint template."),
+                ContentBlock(type="step", label="Serve", text="Run the app and call /responses or /api/decks/create."),
+                ContentBlock(type="step", label="Review", text="Open the generated PPTX from the generated folder."),
+            ],
+        ),
+        SlidePlan(
+            slide_number=5,
+            intent="risks",
+            title="Validation and guardrails",
+            message="The prototype includes quality gates that make failures visible before a deck is handed to a customer.",
+            layout_hint="content",
+            content_blocks=[
+                ContentBlock(type="risk", label="Package integrity", text="Generated files are reopened as PPTX packages after creation."),
+                ContentBlock(type="risk", label="Placeholder leakage", text="Validation flags leftover template tokens, sample filler, and prompt text."),
+                ContentBlock(type="risk", label="Visual risk", text="Text-length warnings identify slides likely to need layout adjustment."),
+            ],
+        ),
+        SlidePlan(
+            slide_number=6,
+            intent="conclusion",
+            title="Production hardening path",
+            message="The next step is to wire the same contracts to Foundry identity, customer storage, source grounding, and evaluation datasets.",
+            layout_hint="title",
+            content_blocks=[
+                ContentBlock(type="callout", label="Next step", text="Onboard one real customer template and expose the generator as a Foundry Toolbox, MCP, or OpenAPI tool."),
+            ],
+        ),
+    ]
+    selected = slides[:slide_count]
+    for index, slide in enumerate(selected, start=1):
+        slide.slide_number = index
+    return DeckPlan(
+        deck=DeckMetadata(
+            title="Foundry PPTX Agent Overview",
+            audience="Customer and field engineering stakeholders",
+            tone="Professional, implementation-focused",
+            template_id=template_id,
+            slide_count=len(selected),
+        ),
+        slides=selected,
+    )
+
+
+def _is_implementation_overview(prompt: str) -> bool:
+    normalized = prompt.lower()
+    return "overview" in normalized and ("implementation" in normalized or "foundry pptx agent" in normalized)
+
+
 def _topic_from_prompt(prompt: str) -> str:
     normalized = " ".join(prompt.split()).strip()
     if not normalized:
@@ -94,4 +185,3 @@ def _topic_from_prompt(prompt: str) -> str:
     if len(normalized) <= 72:
         return normalized[0].upper() + normalized[1:]
     return normalized[:69].rstrip() + "..."
-

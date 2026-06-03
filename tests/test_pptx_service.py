@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from foundry_pptx_agent.app import app
+from foundry_pptx_agent.planner import create_demo_plan
 from foundry_pptx_agent.pptx_service import create_deck, validate_deck
 from foundry_pptx_agent.schemas import CreateDeckRequest, DeckPlan
 
@@ -63,3 +64,19 @@ def test_responses_endpoint_creates_artifact() -> None:
     assert body["status"] == "completed"
     assert Path(body["metadata"]["artifact_path"]).exists()
 
+
+def test_implementation_overview_prompt_uses_specific_plan() -> None:
+    plan = create_demo_plan(
+        "Create a customer-ready overview deck of our Foundry PPTX Agent implementation.",
+        "sample-board-template",
+        6,
+    )
+    assert plan.deck.title == "Foundry PPTX Agent Overview"
+    assert [slide.title for slide in plan.slides] == [
+        "Foundry PPTX Agent Overview",
+        "What we implemented",
+        "Architecture split",
+        "How the demo runs",
+        "Validation and guardrails",
+        "Production hardening path",
+    ]
