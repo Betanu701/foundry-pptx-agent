@@ -40,6 +40,12 @@ class AnalyzeTemplateRequest(BaseModel):
     template_id: str = "sample-board-template"
 
 
+class OnboardTemplateRequest(BaseModel):
+    source_path: str
+    template_id: str | None = None
+    overwrite: bool = False
+
+
 class ValidateDeckRequest(BaseModel):
     deck_path: str
     template_id: str = "sample-board-template"
@@ -73,4 +79,3 @@ class HealthResponse(BaseModel):
 
 def as_posix_str(path: Path) -> str:
     return path.resolve().as_posix()
-

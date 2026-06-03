@@ -38,6 +38,7 @@ The generated `.pptx` is written to `generated\`.
 | --- | --- |
 | `GET /health` | Service health and runtime paths |
 | `GET /api/templates` | List available `.pptx` templates |
+| `POST /api/templates/onboard` | Import a dropped-in `.pptx`, inspect master layouts, and create a contract |
 | `POST /api/templates/analyze` | Inspect slide layouts and placeholders |
 | `POST /api/decks/create` | Generate a `.pptx` from a structured deck plan |
 | `POST /api/decks/validate` | Validate package integrity, placeholder leakage, and text-length risk |
@@ -72,10 +73,25 @@ The contract defines brand colors, supported intents, text limits, and required 
 For a real customer deck, import the `.pptx` locally instead of committing it:
 
 ```powershell
-python .\scripts\import_template.py "C:\path\to\customer-template.pptx" --template-id customer-master-template
+python .\scripts\import_template.py "C:\path\to\customer-template.pptx" --template-id customer-master-template --overwrite
 ```
 
-Then call the service with `template_id = "customer-master-template"`. The matching contract uses `render_mode: master_layout`, which fills text placeholders from the PowerPoint master/layouts directly instead of drawing a separate visual layer over the deck.
+The import step:
+
+1. Copies the dropped-in deck to `templates\<template-id>.pptx`.
+2. Reads the slide master layouts and placeholder inventory.
+3. Infers a `layout_map` for common intents such as title, comparison, timeline, risks, and conclusion.
+4. Writes `templates\<template-id>.contract.json`.
+
+Then call the service with `template_id = "customer-master-template"`. The generated contract uses `render_mode: master_layout`, which fills text placeholders from the PowerPoint master/layouts directly instead of drawing a separate visual layer over the deck.
+
+You can also onboard through the API:
+
+```powershell
+curl.exe -X POST http://localhost:8088/api/templates/onboard `
+  -H "Content-Type: application/json" `
+  -d "{\"source_path\":\"C:\\path\\to\\customer-template.pptx\",\"template_id\":\"customer-master-template\",\"overwrite\":true}"
+```
 
 ## MVP limitations
 

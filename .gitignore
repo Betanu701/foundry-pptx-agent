@@ -6,6 +6,7 @@ __pycache__/
 .env
 generated/
 templates/customer-*.pptx
+templates/customer-*.contract.json
 templates/*Confidential*.pptx
 *.egg-info/
 dist/

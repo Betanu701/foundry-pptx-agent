@@ -1,28 +1,26 @@
 from __future__ import annotations
 
 import argparse
-import shutil
 from pathlib import Path
 
-
-ROOT = Path(__file__).resolve().parents[1]
-TEMPLATES = ROOT / "templates"
+from foundry_pptx_agent.template_onboarding import onboard_template
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Import a local customer PowerPoint template without committing it.")
+    parser = argparse.ArgumentParser(description="Import and onboard a local customer PowerPoint template.")
     parser.add_argument("source", help="Path to the source .pptx template")
     parser.add_argument("--template-id", default="customer-master-template")
+    parser.add_argument("--overwrite", action="store_true", help="Replace existing template and contract files.")
     args = parser.parse_args()
 
     source = Path(args.source).expanduser().resolve()
-    if not source.exists() or source.suffix.lower() != ".pptx":
-        raise SystemExit(f"Expected a .pptx file, got: {source}")
-
-    TEMPLATES.mkdir(parents=True, exist_ok=True)
-    destination = TEMPLATES / f"{args.template_id}.pptx"
-    shutil.copy2(source, destination)
-    print(destination)
+    result = onboard_template(source, args.template_id, args.overwrite)
+    print(f"Template: {result['template_path']}")
+    print(f"Contract: {result['contract_path']}")
+    print("Inferred layout map:")
+    for intent, layout_index in result["contract"]["layout_map"].items():
+        layout = result["contract"]["layout_catalog"][layout_index]
+        print(f"  {intent}: {layout_index} ({layout['name']})")
 
 
 if __name__ == "__main__":

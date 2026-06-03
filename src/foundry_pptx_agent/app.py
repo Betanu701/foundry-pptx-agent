@@ -13,10 +13,12 @@ from .schemas import (
     AnalyzeTemplateRequest,
     CreateDeckRequest,
     HealthResponse,
+    OnboardTemplateRequest,
     ResponsesRequest,
     ValidateDeckRequest,
 )
 from .settings import DEFAULT_TEMPLATE_ID, OUTPUT_DIR, TEMPLATES_DIR, ensure_runtime_dirs
+from .template_onboarding import onboard_template
 
 ensure_runtime_dirs()
 
@@ -43,6 +45,16 @@ def post_analyze_template(request: AnalyzeTemplateRequest) -> dict[str, Any]:
         return analyze_template(request.template_id)
     except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@app.post("/api/templates/onboard")
+def post_onboard_template(request: OnboardTemplateRequest) -> dict[str, Any]:
+    try:
+        return onboard_template(request.source_path, request.template_id, request.overwrite)
+    except FileExistsError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (FileNotFoundError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/api/decks/create")
@@ -115,4 +127,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

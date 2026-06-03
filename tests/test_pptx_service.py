@@ -9,6 +9,8 @@ from foundry_pptx_agent.app import app
 from foundry_pptx_agent.planner import create_demo_plan
 from foundry_pptx_agent.pptx_service import create_deck, validate_deck
 from foundry_pptx_agent.schemas import CreateDeckRequest, DeckPlan
+from foundry_pptx_agent.settings import template_contract_path
+from foundry_pptx_agent.template_onboarding import onboard_template, template_path_for_write
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,3 +82,22 @@ def test_implementation_overview_prompt_uses_specific_plan() -> None:
         "Validation and guardrails",
         "Production hardening path",
     ]
+
+
+def test_onboard_template_creates_master_layout_contract() -> None:
+    template_id = "onboarded-sample-template"
+    copied_template = template_path_for_write(template_id)
+    copied_contract = template_contract_path(template_id)
+    copied_template.unlink(missing_ok=True)
+    copied_contract.unlink(missing_ok=True)
+    try:
+        result = onboard_template(ROOT / "templates" / "sample-board-template.pptx", template_id)
+        assert Path(result["template_path"]).exists()
+        assert Path(result["contract_path"]).exists()
+        contract = result["contract"]
+        assert contract["render_mode"] == "master_layout"
+        assert set(["title", "executive_summary", "comparison", "timeline", "risks", "conclusion"]).issubset(contract["layout_map"])
+        assert len(contract["layout_catalog"]) > 0
+    finally:
+        copied_template.unlink(missing_ok=True)
+        copied_contract.unlink(missing_ok=True)
