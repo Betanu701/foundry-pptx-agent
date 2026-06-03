@@ -5,7 +5,8 @@ __pycache__/
 .ruff_cache/
 .env
 generated/
+templates/customer-*.pptx
+templates/*Confidential*.pptx
 *.egg-info/
 dist/
 build/
-

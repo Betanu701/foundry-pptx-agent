@@ -69,6 +69,14 @@ For each template, add:
 
 The contract defines brand colors, supported intents, text limits, and required footer text. The sample files show the expected shape.
 
+For a real customer deck, import the `.pptx` locally instead of committing it:
+
+```powershell
+python .\scripts\import_template.py "C:\path\to\customer-template.pptx" --template-id customer-master-template
+```
+
+Then call the service with `template_id = "customer-master-template"`. The matching contract uses `render_mode: master_layout`, which fills text placeholders from the PowerPoint master/layouts directly instead of drawing a separate visual layer over the deck.
+
 ## MVP limitations
 
 - The prototype uses layout-based template reuse, not arbitrary slide XML duplication.
@@ -94,4 +102,3 @@ Recommended hardening before a customer pilot:
 python .\scripts\create_sample_template.py
 pytest
 ```
-

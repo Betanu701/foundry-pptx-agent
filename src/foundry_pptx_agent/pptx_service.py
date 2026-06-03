@@ -4,7 +4,6 @@ import json
 import re
 import time
 import zipfile
-from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -82,9 +81,12 @@ def create_deck(request: CreateDeckRequest) -> CreateDeckResponse:
 
     slide_mapping: list[dict[str, Any]] = []
     for slide_plan in request.deck_plan.slides:
-        layout_index, reason = _resolve_layout(prs, slide_plan)
+        layout_index, reason = _resolve_layout(prs, slide_plan, contract)
         slide = prs.slides.add_slide(prs.slide_layouts[layout_index])
-        _apply_slide_design(prs, slide, slide_plan, brand)
+        if contract.get("render_mode") == "master_layout":
+            _apply_master_layout_content(slide, slide_plan, contract)
+        else:
+            _apply_slide_design(prs, slide, slide_plan, brand)
         slide_mapping.append(
             {
                 "slide_number": slide_plan.slide_number,
@@ -194,7 +196,17 @@ def _remove_existing_slides(prs: Presentation) -> None:
         slide_id_list.remove(slide_id)
 
 
-def _resolve_layout(prs: Presentation, slide_plan: SlidePlan) -> tuple[int, str]:
+def _resolve_layout(prs: Presentation, slide_plan: SlidePlan, contract: dict[str, Any] | None = None) -> tuple[int, str]:
+    layout_map = (contract or {}).get("layout_map", {})
+    configured = layout_map.get(slide_plan.intent) or layout_map.get(slide_plan.layout_hint)
+    if configured is not None:
+        if isinstance(configured, int) and 0 <= configured < len(prs.slide_layouts):
+            return configured, "matched contract layout_map index"
+        if isinstance(configured, str):
+            for index, layout in enumerate(prs.slide_layouts):
+                if configured.lower() == layout.name.lower():
+                    return index, "matched contract layout_map name"
+
     names = [layout.name.lower() for layout in prs.slide_layouts]
     hint = slide_plan.layout_hint.lower().strip()
     intent = slide_plan.intent.lower().strip()
@@ -222,6 +234,133 @@ def _intent_tokens(intent: str) -> list[str]:
         "risks": ["content"],
     }
     return mapping.get(intent, ["content", "title"])
+
+
+def _apply_master_layout_content(slide: Any, plan: SlidePlan, contract: dict[str, Any]) -> None:
+    text_placeholders = _text_placeholders(slide)
+    if not text_placeholders:
+        return
+
+    title_shape = _title_shape(slide)
+    if title_shape is not None:
+        _write_text_frame(title_shape.text_frame, [plan.title])
+
+    body_shapes = [shape for shape in text_placeholders if shape != title_shape]
+    if not body_shapes:
+        return
+
+    lines = _content_lines(plan)
+    if len(body_shapes) == 1:
+        _write_text_frame(body_shapes[0].text_frame, lines)
+        return
+
+    blocks = plan.content_blocks
+    columns = _placeholder_columns(body_shapes)
+    if blocks and len(columns) >= len(blocks) and all(len(column) >= 2 for column in columns[: len(blocks)]):
+        used_shapes: list[Any] = []
+        for column, block in zip(columns, blocks, strict=False):
+            _write_text_frame(column[0].text_frame, [block.label])
+            _write_text_frame(column[1].text_frame, [block.text])
+            used_shapes.extend(column[:2])
+        for shape in body_shapes:
+            if shape not in used_shapes:
+                shape.text_frame.clear()
+        return
+
+    if blocks and len(body_shapes) >= len(blocks) * 2:
+        paired = _top_then_body_pairs(body_shapes)
+        for (label_shape, body_shape), block in zip(paired, blocks, strict=False):
+            _write_text_frame(label_shape.text_frame, [block.label])
+            _write_text_frame(body_shape.text_frame, [block.text])
+        for shape in body_shapes[len(paired) * 2 :]:
+            shape.text_frame.clear()
+        return
+
+    values = _distributed_values(plan, len(body_shapes))
+    for shape, value in zip(body_shapes, values, strict=False):
+        _write_text_frame(shape.text_frame, value)
+    for shape in body_shapes[len(values) :]:
+        shape.text_frame.clear()
+
+
+def _text_placeholders(slide: Any) -> list[Any]:
+    placeholders: list[Any] = []
+    for shape in slide.placeholders:
+        if not getattr(shape, "has_text_frame", False):
+            continue
+        try:
+            placeholder_type = shape.placeholder_format.type
+        except ValueError:
+            continue
+        if placeholder_type in {
+            PP_PLACEHOLDER.TITLE,
+            PP_PLACEHOLDER.CENTER_TITLE,
+            PP_PLACEHOLDER.BODY,
+            PP_PLACEHOLDER.OBJECT,
+            PP_PLACEHOLDER.SUBTITLE,
+        }:
+            placeholders.append(shape)
+    return placeholders
+
+
+def _placeholder_idx(shape: Any) -> int:
+    try:
+        return int(shape.placeholder_format.idx)
+    except ValueError:
+        return 999
+
+
+def _placeholder_columns(shapes: list[Any]) -> list[list[Any]]:
+    columns: list[list[Any]] = []
+    tolerance = 91440  # 0.1 inch in EMUs.
+    for shape in sorted(shapes, key=lambda item: (int(item.left), int(item.top))):
+        for column in columns:
+            if abs(int(column[0].left) - int(shape.left)) <= tolerance:
+                column.append(shape)
+                break
+        else:
+            columns.append([shape])
+    for column in columns:
+        column.sort(key=lambda item: int(item.top))
+    return columns
+
+
+def _top_then_body_pairs(shapes: list[Any]) -> list[tuple[Any, Any]]:
+    ordered = sorted(shapes, key=lambda item: (int(item.top), int(item.left)))
+    midpoint = len(ordered) // 2
+    labels = sorted(ordered[:midpoint], key=lambda item: int(item.left))
+    bodies = sorted(ordered[midpoint:], key=lambda item: int(item.left))
+    return list(zip(labels, bodies, strict=False))
+
+
+def _content_lines(plan: SlidePlan) -> list[str]:
+    lines = [plan.message] if plan.message else []
+    for block in plan.content_blocks:
+        if block.label:
+            lines.append(block.label)
+        lines.append(block.text)
+    return [line for line in lines if line]
+
+
+def _distributed_values(plan: SlidePlan, count: int) -> list[list[str]]:
+    if not plan.content_blocks:
+        return [[plan.message]] if plan.message else []
+    values: list[list[str]] = []
+    for block in plan.content_blocks[:count]:
+        values.append([line for line in [block.label, block.text] if line])
+    return values
+
+
+def _write_text_frame(text_frame: Any, lines: list[str]) -> None:
+    text_frame.clear()
+    text_frame.word_wrap = True
+    if not lines:
+        return
+    first = text_frame.paragraphs[0]
+    first.text = lines[0]
+    for line in lines[1:]:
+        paragraph = text_frame.add_paragraph()
+        paragraph.text = line
 
 
 def _apply_slide_design(prs: Presentation, slide: Any, plan: SlidePlan, brand: dict[str, str]) -> None:
