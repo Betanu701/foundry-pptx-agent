@@ -1,0 +1,13 @@
+services:
+  foundry-pptx-agent:
+    build: .
+    ports:
+      - "8088:8088"
+    environment:
+      TEMPLATES_DIR: templates
+      OUTPUT_DIR: generated
+      DEFAULT_TEMPLATE_ID: sample-board-template
+      PUBLIC_BASE_URL: http://localhost:8088
+    volumes:
+      - ./templates:/app/templates
+      - ./generated:/app/generated

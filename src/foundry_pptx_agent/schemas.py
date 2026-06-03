@@ -59,6 +59,7 @@ class CreateDeckRequest(BaseModel):
 
 class CreateDeckResponse(BaseModel):
     artifact_path: str
+    artifact_url: str
     template_id: str
     slide_count: int
     validation: dict[str, Any]

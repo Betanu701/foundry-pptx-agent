@@ -41,6 +41,7 @@ def test_create_and_validate_deck() -> None:
     assert result.slide_count == 6
     assert result.validation["ok"] is True
     assert Path(result.artifact_path).exists()
+    assert result.artifact_url.endswith("pytest-generated-deck.pptx")
 
 
 def test_validate_detects_placeholder_text(tmp_path: Path) -> None:
@@ -65,6 +66,7 @@ def test_responses_endpoint_creates_artifact() -> None:
     body = response.json()
     assert body["status"] == "completed"
     assert Path(body["metadata"]["artifact_path"]).exists()
+    assert body["metadata"]["artifact_url"].startswith("/api/artifacts/")
 
 
 def test_implementation_overview_prompt_uses_specific_plan() -> None:
@@ -101,3 +103,41 @@ def test_onboard_template_creates_master_layout_contract() -> None:
     finally:
         copied_template.unlink(missing_ok=True)
         copied_contract.unlink(missing_ok=True)
+
+
+def test_upload_template_onboards_file() -> None:
+    template_id = "uploaded-sample-template"
+    copied_template = template_path_for_write(template_id)
+    copied_contract = template_contract_path(template_id)
+    copied_template.unlink(missing_ok=True)
+    copied_contract.unlink(missing_ok=True)
+    client = TestClient(app)
+    try:
+        with (ROOT / "templates" / "sample-board-template.pptx").open("rb") as handle:
+            response = client.post(
+                "/api/templates/upload",
+                data={"template_id": template_id, "overwrite": "true"},
+                files={"file": ("sample-board-template.pptx", handle, "application/vnd.openxmlformats-officedocument.presentationml.presentation")},
+            )
+        assert response.status_code == 200
+        body = response.json()
+        assert body["template_id"] == template_id
+        assert Path(body["template_path"]).exists()
+        assert Path(body["contract_path"]).exists()
+    finally:
+        copied_template.unlink(missing_ok=True)
+        copied_contract.unlink(missing_ok=True)
+
+
+def test_artifact_download_endpoint() -> None:
+    result = create_deck(
+        CreateDeckRequest(
+            template_id="sample-board-template",
+            deck_plan=_sample_plan(),
+            output_name="pytest-download-deck.pptx",
+        )
+    )
+    client = TestClient(app)
+    response = client.get(result.artifact_url)
+    assert response.status_code == 200
+    assert response.content[:2] == b"PK"

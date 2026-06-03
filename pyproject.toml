@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
+    "python-multipart>=0.0.12",
     "python-pptx>=1.0.2",
     "pydantic>=2.8.0",
     "uvicorn[standard]>=0.30.0",
@@ -23,4 +24,3 @@ foundry-pptx-agent = "foundry_pptx_agent.app:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-

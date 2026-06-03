@@ -13,7 +13,7 @@ from pptx.enum.shapes import MSO_SHAPE, PP_PLACEHOLDER
 from pptx.util import Inches, Pt
 
 from .schemas import CreateDeckRequest, CreateDeckResponse, DeckPlan, SlidePlan, as_posix_str
-from .settings import OUTPUT_DIR, template_contract_path, template_path
+from .settings import OUTPUT_DIR, artifact_url, template_contract_path, template_path
 
 PLACEHOLDER_PATTERNS = [
     re.compile(pattern, re.IGNORECASE)
@@ -107,6 +107,7 @@ def create_deck(request: CreateDeckRequest) -> CreateDeckResponse:
     validation = validate_deck(output_path, template_id)
     return CreateDeckResponse(
         artifact_path=as_posix_str(output_path),
+        artifact_url=artifact_url(output_path.name),
         template_id=template_id,
         slide_count=len(request.deck_plan.slides),
         validation=validation,

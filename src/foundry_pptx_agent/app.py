@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import time
 import uuid
+import shutil
+import tempfile
+from pathlib import Path
 from typing import Any
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 
 from .planner import create_demo_plan
 from .pptx_service import analyze_template, create_deck, list_templates, validate_deck
@@ -57,6 +61,27 @@ def post_onboard_template(request: OnboardTemplateRequest) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
+@app.post("/api/templates/upload")
+def post_upload_template(
+    file: UploadFile = File(..., description="PowerPoint .pptx template or existing deck to onboard"),
+    template_id: str | None = Form(default=None),
+    overwrite: bool = Form(default=False),
+) -> dict[str, Any]:
+    if not file.filename or not file.filename.lower().endswith(".pptx"):
+        raise HTTPException(status_code=400, detail="Upload must be a .pptx file.")
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pptx") as tmp:
+        temp_path = Path(tmp.name)
+        shutil.copyfileobj(file.file, tmp)
+    try:
+        return onboard_template(temp_path, template_id, overwrite)
+    except FileExistsError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except (FileNotFoundError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    finally:
+        temp_path.unlink(missing_ok=True)
+
+
 @app.post("/api/decks/create")
 def post_create_deck(request: CreateDeckRequest) -> dict[str, Any]:
     try:
@@ -70,6 +95,19 @@ def post_validate_deck(request: ValidateDeckRequest) -> dict[str, Any]:
     return validate_deck(request.deck_path, request.template_id)
 
 
+@app.get("/api/artifacts/{filename}")
+def get_artifact(filename: str) -> FileResponse:
+    safe_name = Path(filename).name
+    path = (OUTPUT_DIR / safe_name).resolve()
+    if not str(path).startswith(str(OUTPUT_DIR)) or not path.exists() or path.suffix.lower() != ".pptx":
+        raise HTTPException(status_code=404, detail="Artifact not found.")
+    return FileResponse(
+        path,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        filename=safe_name,
+    )
+
+
 @app.post("/responses")
 def responses(request: ResponsesRequest) -> dict[str, Any]:
     prompt = _extract_prompt(request.input)
@@ -78,7 +116,7 @@ def responses(request: ResponsesRequest) -> dict[str, Any]:
     result = create_deck(CreateDeckRequest(template_id=template_id, deck_plan=deck_plan))
     text = (
         f"Created {result.slide_count}-slide PowerPoint deck '{deck_plan.deck.title}'. "
-        f"Artifact: {result.artifact_path}. "
+        f"Artifact: {result.artifact_url}. "
         f"Validation: {'passed' if result.validation.get('ok') else 'needs review'}."
     )
     return {
@@ -96,6 +134,7 @@ def responses(request: ResponsesRequest) -> dict[str, Any]:
         ],
         "metadata": {
             "artifact_path": result.artifact_path,
+            "artifact_url": result.artifact_url,
             "template_id": result.template_id,
             "slide_count": result.slide_count,
             "validation": result.validation,

@@ -42,7 +42,18 @@ The generated `.pptx` is written to `generated\`.
 | `POST /api/templates/analyze` | Inspect slide layouts and placeholders |
 | `POST /api/decks/create` | Generate a `.pptx` from a structured deck plan |
 | `POST /api/decks/validate` | Validate package integrity, placeholder leakage, and text-length risk |
+| `GET /api/artifacts/{filename}` | Download generated `.pptx` artifacts |
 | `POST /responses` | Foundry/OpenAI Responses-style demo endpoint |
+
+## Microsoft Foundry integration
+
+Use this service as a Foundry **OpenAPI tool / Toolbox capability**. Deploy the repo, then register the deployed OpenAPI URL:
+
+```text
+https://<service-host>/openapi.json
+```
+
+See [docs/foundry-integration.md](docs/foundry-integration.md) for the Tool Catalog/Toolbox registration flow and suggested agent instructions.
 
 ## Generate from a structured plan
 

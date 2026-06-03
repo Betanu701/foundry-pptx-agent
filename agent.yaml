@@ -14,4 +14,5 @@ template:
       value: generated
     - name: DEFAULT_TEMPLATE_ID
       value: sample-board-template
-
+    - name: PUBLIC_BASE_URL
+      value: ""

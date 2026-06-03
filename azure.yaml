@@ -1,0 +1,9 @@
+name: foundry-pptx-agent
+metadata:
+  template: foundry-pptx-agent@0.1.0
+services:
+  api:
+    project: .
+    host: containerapp
+    language: docker
+
