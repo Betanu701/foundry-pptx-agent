@@ -4,6 +4,8 @@ environments:
     agentName: foundry-pptx-agent
     projectEndpoint: ""
     azureContainerRegistry: ""
+    serviceUrl: ""
+    openApiUrl: ""
     evaluationSuites:
       - name: sample-board-briefing
         dataset: examples\sample_deck_plan.json

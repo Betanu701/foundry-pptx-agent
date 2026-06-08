@@ -55,6 +55,8 @@ https://<service-host>/openapi.json
 
 See [docs/foundry-integration.md](docs/foundry-integration.md) for the Tool Catalog/Toolbox registration flow and suggested agent instructions.
 
+For a generic handoff guide that covers local installation, Azure deployment, environment configuration, and Foundry agent usage, see [docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md](docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md).
+
 ## Generate from a structured plan
 
 ```powershell
