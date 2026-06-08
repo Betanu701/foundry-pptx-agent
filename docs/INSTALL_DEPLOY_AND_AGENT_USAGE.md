@@ -398,6 +398,8 @@ Do not commit customer-confidential templates unless your repository policy allo
 
 ## 12. Production Hardening Checklist
 
+For a stakeholder-oriented discussion guide, see [PRODUCTION_SECURITY_TALK_TRACK.md](PRODUCTION_SECURITY_TALK_TRACK.md).
+
 Before production use:
 
 - Put generated decks in persistent storage such as Azure Blob Storage, SharePoint, or OneDrive.

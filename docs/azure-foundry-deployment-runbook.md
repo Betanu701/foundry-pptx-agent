@@ -6,6 +6,8 @@ This document is sanitized for handoff. It does not contain tenant IDs, subscrip
 
 For the full install, deployment, and agent usage guide, see [INSTALL_DEPLOY_AND_AGENT_USAGE.md](INSTALL_DEPLOY_AND_AGENT_USAGE.md).
 
+For production security discussion points, see [PRODUCTION_SECURITY_TALK_TRACK.md](PRODUCTION_SECURITY_TALK_TRACK.md).
+
 ## Deployment Configuration
 
 Copy and fill the deployment environment file:
