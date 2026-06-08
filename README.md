@@ -55,7 +55,7 @@ https://<service-host>/openapi.json
 
 See [docs/foundry-integration.md](docs/foundry-integration.md) for the Tool Catalog/Toolbox registration flow and suggested agent instructions.
 
-For a generic handoff guide that covers local installation, Azure deployment, environment configuration, and Foundry agent usage, see [docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md](docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md). For production security discussion points, see [docs/PRODUCTION_SECURITY_TALK_TRACK.md](docs/PRODUCTION_SECURITY_TALK_TRACK.md).
+For a generic handoff guide that covers local installation, Azure deployment, environment configuration, and Foundry agent usage, see [docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md](docs/INSTALL_DEPLOY_AND_AGENT_USAGE.md). To deploy this service as an MCP server instead of an OpenAPI tool, see [docs/INSTALL_DEPLOY_AS_MCP.md](docs/INSTALL_DEPLOY_AS_MCP.md). For copy-ready agent instructions, see [docs/AGENT_INSTRUCTIONS_EXAMPLES.md](docs/AGENT_INSTRUCTIONS_EXAMPLES.md). For production security discussion points, see [docs/PRODUCTION_SECURITY_TALK_TRACK.md](docs/PRODUCTION_SECURITY_TALK_TRACK.md).
 
 ## Generate from a structured plan
 

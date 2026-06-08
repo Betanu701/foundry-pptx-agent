@@ -5,6 +5,7 @@ __pycache__/
 .ruff_cache/
 .env
 .env.deployment
+.env.mcp.deployment
 generated/
 templates/customer-*.pptx
 templates/customer-*.contract.json

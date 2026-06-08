@@ -4,6 +4,10 @@ This guide explains how to run the Foundry PPTX Agent locally, deploy it to Azur
 
 The guide is intentionally generic. Fill in your own Azure subscription, resource group, region, Foundry project, and resource names in `.env.deployment` before deploying.
 
+If you want to deploy the service as a Model Context Protocol server instead of an OpenAPI tool, use [INSTALL_DEPLOY_AS_MCP.md](INSTALL_DEPLOY_AS_MCP.md).
+
+For copy-ready Foundry agent instructions, use [AGENT_INSTRUCTIONS_EXAMPLES.md](AGENT_INSTRUCTIONS_EXAMPLES.md).
+
 ## What This Service Does
 
 Foundry PPTX Agent exposes an HTTPS API that can generate PowerPoint decks from approved templates. A Foundry agent can call it as an OpenAPI tool when a user asks for a deck.

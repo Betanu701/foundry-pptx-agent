@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
+    "mcp>=1.9.0",
     "python-multipart>=0.0.12",
     "python-pptx>=1.0.2",
     "pydantic>=2.8.0",
@@ -20,6 +21,7 @@ dev = [
 
 [project.scripts]
 foundry-pptx-agent = "foundry_pptx_agent.app:main"
+foundry-pptx-agent-mcp = "foundry_pptx_agent.mcp_server:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+
+WORKDIR /app
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+COPY templates ./templates
+COPY examples ./examples
+
+RUN pip install --no-cache-dir .
+
+ENV MCP_TRANSPORT=streamable-http
+ENV MCP_HOST=0.0.0.0
+ENV MCP_PORT=8089
+ENV TEMPLATES_DIR=templates
+ENV OUTPUT_DIR=generated
+ENV DEFAULT_TEMPLATE_ID=sample-board-template
+EXPOSE 8089
+
+CMD ["python", "-m", "foundry_pptx_agent.mcp_server"]

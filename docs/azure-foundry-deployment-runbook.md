@@ -6,6 +6,10 @@ This document is sanitized for handoff. It does not contain tenant IDs, subscrip
 
 For the full install, deployment, and agent usage guide, see [INSTALL_DEPLOY_AND_AGENT_USAGE.md](INSTALL_DEPLOY_AND_AGENT_USAGE.md).
 
+For an MCP server deployment path, see [INSTALL_DEPLOY_AS_MCP.md](INSTALL_DEPLOY_AS_MCP.md).
+
+For copy-ready agent instructions, see [AGENT_INSTRUCTIONS_EXAMPLES.md](AGENT_INSTRUCTIONS_EXAMPLES.md).
+
 For production security discussion points, see [PRODUCTION_SECURITY_TALK_TRACK.md](PRODUCTION_SECURITY_TALK_TRACK.md).
 
 ## Deployment Configuration
